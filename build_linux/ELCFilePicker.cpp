@@ -63,9 +63,52 @@ std::string FilePickerGUI(const std::string& folder,
             e
         );
 
-        btn.onClick = [&selected, e]() {
+        btn.onClick = [&]() {
+            // If folder (ends with '/'), open it
+            if (!e.empty() && e.back() == '/') {
+                std::string newFolder = e.substr(0, e.size() - 1);
+        
+                // Rebuild entries
+                entries.clear();
+                for (auto& entry : fs::directory_iterator(newFolder)) {
+        
+                    if (entry.is_directory()) {
+                        entries.push_back(entry.path().string() + "/");
+                    }
+                    else if (entry.is_regular_file()) {
+                        std::string ext = entry.path().extension().string();
+                        if (!ext.empty() && ext[0] == '.') ext = ext.substr(1);
+        
+                        for (auto& f : filters) {
+                            if (ext == f) {
+                                entries.push_back(entry.path().string());
+                                break;
+                            }
+                        }
+                    }
+                }
+        
+                // Clear GUI and rebuild buttons
+                gui.widgets.clear();
+                int y2 = 150;
+                for (auto& e2 : entries) {
+                    auto& btn2 = gui.emplace_back<ELC::Button>(
+                        ELC::Vec2{dialogX + 40, (float)y2},
+                        ELC::Vec2{dialogW - 80, 40},
+                        e2
+                    );
+        
+                    btn2.onClick = btn.onClick;  // recursive handler
+        
+                    y2 += 50;
+                }
+        
+                return;
+            }
+        
             selected = e;
         };
+        
 
         y += 50;
     }
