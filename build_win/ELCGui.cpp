@@ -9,6 +9,14 @@ void ELC::Gui::Draw() {
     for (auto& w : widgets) w->Draw();
 }
 
+void ELC::Gui::SetOffsetY(float yOff) {
+    for (auto& w : widgets) {
+        w->rect.y += yOff;
+    }
+}
+
+
+
 void ELC::Button::Update() {
     Vector2 mouse = ELC::Core::ToVector2(ELC::Core::GetMousePosition());
     if (CheckCollisionPointRec(mouse, rect) && ELC::Core::IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
