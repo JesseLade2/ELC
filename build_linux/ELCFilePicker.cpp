@@ -7,56 +7,102 @@ namespace fs = std::filesystem;
 namespace ELC {
 
 std::string FilePickerGUI(const std::string& folder,
-                          const std::vector<std::string>& filters) {
-    std::vector<std::string> files;
+                          const std::vector<std::string>& filters,
+                          const std::string& title,
+                          const std::string& description)
+{
+    std::vector<std::string> entries;
 
     if (!fs::exists(folder)) {
         std::cout << "❌ Folder does not exist: " << folder << std::endl;
         return "";
     }
 
-    // Collect files matching filters
+    // Collect folders + filtered files
     for (auto& entry : fs::directory_iterator(folder)) {
-        if (entry.is_regular_file()) {
+
+        if (entry.is_directory()) {
+            entries.push_back(entry.path().string() + "/");   // add slash so it looks like folder
+        }
+        else if (entry.is_regular_file()) {
             std::string ext = entry.path().extension().string();
             if (!ext.empty() && ext[0] == '.') ext = ext.substr(1);
 
             for (auto& f : filters) {
                 if (ext == f) {
-                    files.push_back(entry.path().string());
+                    entries.push_back(entry.path().string());
                     break;
                 }
             }
         }
     }
 
-    if (files.empty()) {
-        std::cout << "❌ No files found in folder: " << folder << std::endl;
+    if (entries.empty()) {
+        std::cout << "❌ No entries in folder: " << folder << std::endl;
         return "";
     }
 
-    // Create GUI
+    // GUI BUILD
     ELC::Gui gui;
-    std::string selectedFile;
+    std::string selected = "";
 
-    int y = 50;
-    for (auto& file : files) {
+    const float dialogW = 700;
+    const float dialogH = 500;
+    const float dialogX = (GetScreenWidth()  - dialogW) / 2;
+    const float dialogY = (GetScreenHeight() - dialogH) / 2;
+
+    // Scroll offset
+    float scrollY = 0;
+
+    // Build entry buttons
+    int y = 150;
+    for (auto& e : entries) {
         auto& btn = gui.emplace_back<ELC::Button>(
-            ELC::Vec2{50.0f, (float)y},   // position
-            ELC::Vec2{600.0f, 40.0f},     // size
-            file                          // label (std::string or const char* depending on constructor)
+            ELC::Vec2{dialogX + 40, (float)y},
+            ELC::Vec2{dialogW - 80, 40},
+            e
         );
-        
-        btn.onClick = [&selectedFile, &file]() {
-            selectedFile = file;
+
+        btn.onClick = [&selected, e]() {
+            selected = e;
         };
+
         y += 50;
     }
 
-    // Render loop until a file is selected or window closed
-    while (!ELC::Core::ShouldClose() && selectedFile.empty()) {
+    // Render loop
+    while (!ELC::Core::ShouldClose() && selected.empty()) {
+
+        // Dim background
         ELC::Core::BeginDrawing();
-        ELC::Core::ClearBackground(ELC::ELC_RAYWHITE);
+        DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Color{0,0,0,150});
+
+        // Dialog box
+        DrawRectangleRounded(
+            {dialogX, dialogY, dialogW, dialogH},
+            0.05f,
+            8,
+            Color{240,240,240,255}
+        );
+
+        // Title
+        DrawText(title.c_str(), dialogX + 30, dialogY + 20, 32, BLACK);
+
+        // Description
+        DrawText(description.c_str(), dialogX + 30, dialogY + 65, 20, DARKGRAY);
+
+        // Scroll
+        float wheel = GetMouseWheelMove();
+        if (wheel != 0) {
+            scrollY += wheel * 20;
+        }
+
+        // Clamp scroll
+        scrollY = std::min(scrollY, 0.0f);
+        scrollY = std::max(scrollY, -(float)entries.size() * 50 + 300);
+
+        // Apply scroll
+        gui.SetOffsetY(scrollY);
 
         gui.Update();
         gui.Draw();
@@ -64,7 +110,7 @@ std::string FilePickerGUI(const std::string& folder,
         ELC::Core::EndDrawing();
     }
 
-    return selectedFile;
+    return selected;
 }
 
 } // namespace ELC
