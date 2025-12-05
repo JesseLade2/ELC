@@ -45,6 +45,7 @@ namespace ELC {
         std::vector<std::shared_ptr<Widget>> widgets;
         void Update();
         void Draw();
+        void SetOffsetY(float yOff);
         template<typename T, typename... Args>
         T& emplace_back(Args... args) {
             widgets.emplace_back(std::make_shared<T>(args...));
