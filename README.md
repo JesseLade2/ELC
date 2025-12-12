@@ -186,7 +186,13 @@ The graphical file picker:
 
 ---
 
+
+#  Releases
+
+* https://github.com/JesseLade2/ELC/releases
 # 💙 Credits
+
+---
 
 * Raylib
 * stb_image
@@ -196,4 +202,5 @@ The graphical file picker:
 Created by **JesseLade** 😎🔥🔥🔥
 
 ---
+
 
