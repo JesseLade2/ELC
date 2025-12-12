@@ -1,114 +1,199 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>ELC Framework</title>
-</head>
-<body>
 
-<h1>🚀 ELC — Easy Lightweight C++ Framework</h1>
+# 🎉 ELC Engine  
+A small, modular game/utility framework built on top of **Raylib**, created by **Coding Master Demi** 😎🔥  
 
-<p><strong>ELC</strong> is a lightweight, modular C++ framework built on top of
-<strong>raylib</strong>.  
-It provides simple UI components, audio utilities, image helpers, popups, math tools,
-and a consistent cross-platform file picker.</p>
+This README explains **EVERY MODULE** inside ELC:
+- ✔ Core system  
+- ✔ GUI widgets  
+- ✔ Popup system  
+- ✔ Math utilities  
+- ✔ Image loader with GIF + ASEPRITE support  
+- ✔ Audio system  
+- ✔ File picker GUI (work-in-progress)
 
-<hr>
+---
 
-<h2>✨ What ELC Provides</h2>
-<ul>
-  <li>🎨 <strong>GUI system</strong> — buttons, labels, windows, popups, layout helpers</li>
-  <li>🖼️ <strong>Image utilities</strong> — easy loading, safe wrapping, scaling, and pixel operations</li>
-  <li>🔊 <strong>Audio helpers</strong> — quick playback, SFX handling, and simple interfaces</li>
-  <li>📐 <strong>Math utilities</strong> — vectors, rectangles, interpolation, and helper math functions</li>
-  <li>📁 <strong>Custom file picker</strong> — same interface and visuals on all platforms  
-      (NOT native dialogs)</li>
-  <li>📦 <strong>Static library</strong> — distributed as <code>libELC.a</code> for each platform</li>
-</ul>
+# 🚀 ELC Overview
 
-<hr>
+ELC is a lightweight wrapper around Raylib that gives you:
 
-<h2>📦 Library Files</h2>
+- Simple UI elements (`Button`, `TextBox`)
+- Modal popups (`Alert`, `Prompt`, `Input`)
+- ASEprite + GIF animation support
+- Audio (music + sound)
+- A cross-platform graphical file picker
 
-<p>ELC is shipped as prebuilt static libraries for each OS:</p>
+Perfect for editors, small games, or tools.
 
-<ul>
-  <li><code>libELC.a</code> — macOS</li>
-  <li><code>libELC-linux.a</code> — Linux</li>
-  <li><code>libELC-windows.a</code> — Windows</li>
-</ul>
+---
 
-<p>You include the header <code>ELC.h</code> and link the proper library for your platform.</p>
+# 📦 Module Breakdown
 
-<hr>
+---
 
-<h2>📁 File Picker</h2>
+## 🖥 **1. Core System (`ELC.h`, `ELC.cpp`)**
 
-<p>ELC includes a unified custom file picker.  
-It is <strong>not native</strong>, but an in-engine cross-platform UI component:</p>
+Provides:
 
-<ul>
-  <li>Works the same on macOS, Windows, and Linux</li>
-  <li>Supports filters (PNG, JPG, etc)</li>
-  <li>Supports selecting single or multiple files</li>
-  <li>Built entirely inside your app with ELC GUI tools</li>
-</ul>
+- Window creation (`Core::Init`)
+- Drawing control (`BeginDrawing`, `EndDrawing`)
+- Input handling (mouse, keyboard)
+- Basic drawing helpers (rectangles, text)
+- Color type wrapper (`ELC_Color`)
+- Vector type wrapper (`Vec2`)
 
-<hr>
+Usage:
 
-<h2>🧱 ELC Modules</h2>
+```cpp
+ELC::Core::Init(800, 600, "My App");
+while (!ELC::Core::ShouldClose()) {
+    ELC::Core::BeginDrawing();
+    ELC::Core::ClearBackground(ELC::ELC_BLACK);
 
-<h3>🔹 ELC</h3>
-<p>The core system, shared utilities, base types, safety helpers.</p>
+    // draw stuff...
 
-<h3>🔹 ELCGui</h3>
-<p>Buttons, windows, labels, popups, layout helpers, interaction tools.</p>
-
-<h3>🔹 ELCImage</h3>
-<p>Safe wrapper around raylib images and textures with helpful utilities.</p>
-
-<h3>🔹 ELCAudio</h3>
-<p>Simple SFX/music handling with minimal API.</p>
-
-<h3>🔹 ELCMath</h3>
-<p>Vector math, geometry helpers, random tools, small utilities.</p>
-
-<h3>🔹 ELCPopup</h3>
-<p>Popup windows, alerts, confirmations, in-UI messages.</p>
-
-<h3>🔹 ELCFilePicker</h3>
-<p>Your cross-platform, non-native file chooser widget.</p>
-
-<hr>
-
-<h2>🧪 Minimal Usage Example</h2>
-
-<pre>
-#include "ELC.h"
-
-int main() {
-    InitWindow(800, 600, "ELC Demo");
-
-    ELC::Button b({50, 50}, {160, 40}, "Click Me!");
-
-    while (!WindowShouldClose()) {
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-        b.Draw();
-        EndDrawing();
-    }
+    ELC::Core::EndDrawing();
 }
-</pre>
+ELC::Core::Close();
+````
 
-<hr>
+---
 
-<h2>📄 License</h2>
-<p>MIT License</p>
+## 🧮 **2. Math Utilities (`ELCMath.h/.cpp`)**
 
-<hr>
+Small helpers:
 
-<h2>❤️ Author</h2>
-<p>Created by <strong>Coding Master Demi</strong></p>
+* `Lerp(a, b, t)`
+* `Clamp(v, min, max)`
+* `Normalize(Vec2 v)`
 
-</body>
-</html>
+---
+
+## 🎨 **3. GUI Widgets (`ELCGui.h/.cpp`)**
+
+Includes:
+
+### ✔ Button
+
+* Detects hover
+* Detects click
+* Runs callback
+
+### ✔ TextBox
+
+* Editable text input
+* Cursor blinking
+* Handles `OnChar`, `OnKeyDown`
+
+### ✔ Gui Manager
+
+* Holds all widgets
+* `gui.Update()`
+* `gui.Draw()`
+
+---
+
+## 🪟 **4. Popups (`ELCPopup.h/.cpp`)**
+
+Fully modal popup windows:
+
+### ✔ `Popup::Alert("Hello!")`
+
+Shows a message and an OK button.
+
+### ✔ `Popup::PromptAnswer("Delete file?", "Yes", "No")`
+
+Returns `true`/`false`.
+
+### ✔ `Popup::PromptText("Name:", "enter...", "OK")`
+
+Returns a string.
+
+All popups freeze the app until answered.
+
+---
+
+## 🖼 **5. Image Loader (`ELCImage.h/.cpp`)**
+
+Supports:
+
+### ✔ PNG / JPG
+
+Loads normally with Raylib.
+
+### ✔ GIF
+
+Uses `stb_image` GIF loader.
+Handles multi-frame animations.
+
+### ✔ ASEPRITE `.ase` / `.aseprite`
+
+Using **cute_aseprite**:
+
+* Supports layers & blending (already blended by cute_aseprite)
+* Loads each frame into a `Texture2D`
+* Animation auto-updates in `UpdateAnimation(delta)`
+
+Usage:
+
+```cpp
+ELC::Image img("sprite.ase");
+while (...) {
+    img.UpdateAnimation(GetFrameTime());
+    img.Draw(100, 100);
+}
+```
+
+---
+
+## 🔊 **6. Audio (`ELCAudio.h/.cpp`)**
+
+### ✔ Sound (one-shot effects)
+
+```cpp
+ELC::Sound click("click.wav");
+click.Play();
+```
+
+### ✔ Music (streaming)
+
+```cpp
+ELC::Music bg("music.ogg");
+bg.Play();
+bg.Update(); // call each frame
+```
+
+---
+
+## 📁 **7. File Picker GUI — WIP**
+
+The graphical file picker:
+
+* Displays folders + files as buttons
+* Lets you navigate folders
+* Supports filters (`png`, `gif`, `ase`)
+* Uses scrolling
+* Returns full path or empty string
+
+---
+
+# 📌 Still in Progress
+
+* Proper clipping of scroll area
+* Keyboard navigation
+* Breadcrumb navigation (folder bar)
+* Icons for folders/files
+
+---
+
+# 💙 Credits
+
+* Raylib
+* stb_image
+* cute_aseprite
+* obviously me!
+
+Created by **JesseLade** 😎🔥🔥🔥
+
+---
+
